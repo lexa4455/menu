@@ -1,0 +1,355 @@
+import pygame
+import sys
+
+# Инициализация Pygame
+pygame.init()
+
+# Определение размеров окна
+WIDTH, HEIGHT = 1200, 675
+MAX_FPS = 60
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Secret Order")
+icon = pygame.image.load("images/icon.png")
+pygame.display.set_icon(icon)
+
+# Загрузка фона для начального разрешения
+main_background = pygame.image.load("images/beckgraund2.jpg")
+button_sound = pygame.mixer.Sound("Sound/button1.wav")
+clock = pygame.time.Clock()
+pygame.mixer.music.load("music/music1.mp3")
+pygame.mixer.music.set_volume(0.1)
+pygame.mixer.music.play(-1)
+
+
+
+# Определение цветов
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+BLUE = (0, 0, 255)
+RED = (255, 0, 0)
+
+# Шрифт
+font = pygame.font.Font("fonts/boozy-2.ttf", 74)
+
+# Функция для отрисовки текста
+def draw_text(text, font, color, surface, x, y):
+    textobj = font.render(text, True, color)
+    textrect = textobj.get_rect(center=(x, y))
+    surface.blit(textobj, textrect)
+
+# Главное меню
+def main_menu():
+    click = False
+    while True:
+        screen.fill(WHITE)
+        screen.blit(main_background, (0, -1))
+        draw_text('Secret Order', font, BLACK, screen, WIDTH // 2, HEIGHT // 4)
+
+        mx, my = pygame.mouse.get_pos()
+        button_1 = pygame.Rect(WIDTH // 3, HEIGHT // 2, WIDTH // 3, 60)
+        button_2 = pygame.Rect(WIDTH // 3, HEIGHT // 2 + 70, WIDTH // 3, 60)
+        button_3 = pygame.Rect(WIDTH // 3, HEIGHT // 2 + 145, WIDTH // 3, 60)
+
+        if button_1.collidepoint((mx, my)):
+            if click:
+                button_sound.play()
+                fade()
+                game()
+        if button_2.collidepoint((mx, my)):
+            if click:
+                button_sound.play()
+                fade()
+                settings_menu()
+        if button_3.collidepoint((mx, my)):
+            if click:
+                button_sound.play()
+                pygame.quit()
+                sys.exit()
+
+        pygame.draw.rect(screen, BLACK, button_1)
+        pygame.draw.rect(screen, BLACK, button_2)
+        pygame.draw.rect(screen, BLACK, button_3)
+
+        draw_text('Start Game', font, WHITE, screen, button_1.centerx, button_1.centery)
+        draw_text('Settings', font, WHITE, screen, button_2.centerx, button_2.centery)
+        draw_text('Quit', font, WHITE, screen, button_3.centerx, button_3.centery)
+
+        click = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+
+        pygame.display.update()
+
+# Меню настроек
+def settings_menu():
+    button_4 = pygame.Rect(WIDTH // 3, HEIGHT // 3, WIDTH // 3, 60)
+    button_5 = pygame.Rect(WIDTH // 3, HEIGHT // 2, WIDTH // 3, 60)
+    button_6 = pygame.Rect(WIDTH // 3, HEIGHT // 2 + 70, WIDTH // 3, 60)
+    button_7 = pygame.Rect(WIDTH // 3, HEIGHT // 2 + 145, WIDTH // 3, 60)
+
+    running = True
+    while running:
+        screen.fill(WHITE)
+        screen.blit(main_background, (0, -1))
+        draw_text('Settings', font, BLACK, screen, WIDTH // 2, HEIGHT // 10)
+
+        pygame.draw.rect(screen, BLACK, button_4)
+        pygame.draw.rect(screen, BLACK, button_5)
+        pygame.draw.rect(screen, BLACK, button_6)
+        pygame.draw.rect(screen, BLACK, button_7)
+
+        draw_text('Control', font, WHITE, screen, button_4.centerx, button_4.centery)
+        draw_text('Audio', font, WHITE, screen, button_5.centerx, button_5.centery)
+        draw_text('Video', font, WHITE, screen, button_6.centerx, button_6.centery)
+        draw_text('Quit', font, WHITE, screen, button_7.centerx, button_7.centery)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    fade()
+                    running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if button_4.collidepoint(event.pos):
+                    fade()
+                    button_sound.play()
+                    control_settings_menu()
+                if button_5.collidepoint(event.pos):
+                    fade()
+                    button_sound.play()
+                    audio_settings_menu()
+                if button_6.collidepoint(event.pos):
+                    fade()
+                    button_sound.play()
+                    video_settings_menu()
+                if button_7.collidepoint(event.pos):
+                    fade()
+                    button_sound.play()
+                    running = False
+
+        pygame.display.flip()
+
+# Меню настроек аудио
+def audio_settings_menu():
+    volume = 0.1  # Начальный уровень громкости
+    is_music_playing = True  # Переменная для хранения состояния музыки
+
+    button_width, button_height = WIDTH // 3, 60
+    button_increase = pygame.Rect((WIDTH - button_width) // 2, HEIGHT // 3, button_width, button_height)
+    button_decrease = pygame.Rect((WIDTH - button_width) // 2, HEIGHT // 3 + 70, button_width, button_height)
+    button_music_toggle = pygame.Rect((WIDTH - button_width) // 2, HEIGHT // 3 + 140, button_width, button_height)
+    button_back = pygame.Rect((WIDTH - button_width) // 2, HEIGHT // 3 + 210, button_width, button_height)
+
+    running = True
+    while running:
+        screen.fill(WHITE)
+        screen.blit(main_background, (0, -1))
+        draw_text('Audio Settings', font, BLACK, screen, WIDTH // 2, HEIGHT // 10)
+
+        pygame.draw.rect(screen, BLACK, button_increase)
+        pygame.draw.rect(screen, BLACK, button_decrease)
+        pygame.draw.rect(screen, BLACK, button_music_toggle)
+        pygame.draw.rect(screen, BLACK, button_back)
+
+        draw_text('Volume Up', font, WHITE, screen, button_increase.centerx, button_increase.centery)
+        draw_text('Volume Down', font, WHITE, screen, button_decrease.centerx, button_decrease.centery)
+        draw_text('Mute/on mute', font, WHITE, screen, button_music_toggle.centerx, button_music_toggle.centery)
+        draw_text('Quit', font, WHITE, screen, button_back.centerx, button_back.centery)
+
+        # Отображение текущего уровня громкости
+        draw_text(f' {int(volume * 100)}%', font, BLACK, screen, WIDTH // 2, HEIGHT // 5)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    fade()
+                    running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if button_increase.collidepoint(event.pos):
+                    if volume < 1.0:  # Максимум громкости
+                        volume += 0.1
+                        pygame.mixer.music.set_volume(volume)
+                if button_decrease.collidepoint(event.pos):
+                    if volume > 0.0:  # Минимум громкости
+                        volume -= 0.1
+                        pygame.mixer.music.set_volume(volume)
+                if button_music_toggle.collidepoint(event.pos):
+                    is_music_playing = not is_music_playing
+                    if is_music_playing:
+                        pygame.mixer.music.unpause()  # Возобновляем музыку
+                    else:
+                        pygame.mixer.music.pause()  # Приостанавливаем музыку
+                if button_back.collidepoint(event.pos):
+                    fade()
+                    running = False
+
+        pygame.display.flip()
+
+# Меню настроек видео
+def video_settings_menu():
+    
+    button_width, button_height = WIDTH // 2, 50
+    button_8 = pygame.Rect((WIDTH - button_width) // 2, HEIGHT // 3, button_width, button_height)
+    button_9 = pygame.Rect((WIDTH - button_width) // 2, HEIGHT // 3 + 70, button_width, button_height)
+    button_10 = pygame.Rect((WIDTH - button_width) // 2, HEIGHT // 3 + 140, button_width, button_height)
+    button_11 = pygame.Rect((WIDTH - button_width) // 2, HEIGHT // 3 + 210, button_width, button_height)
+    running = True
+    while running:
+        screen.fill(WHITE)
+        screen.blit(main_background, (0, -1))
+        draw_text('Video Settings', font, BLACK, screen, WIDTH // 2, HEIGHT // 10)
+
+        pygame.draw.rect(screen, BLACK, button_8)
+        pygame.draw.rect(screen, BLACK, button_9)
+        pygame.draw.rect(screen, BLACK, button_10)
+        pygame.draw.rect(screen, BLACK, button_11)
+
+        draw_text('960x600', font, WHITE, screen, button_8.centerx, button_8.centery)
+        draw_text('1280x800', font, WHITE, screen, button_9.centerx, button_9.centery)
+        draw_text('Full HD', font, WHITE, screen, button_10.centerx, button_10.centery)
+        draw_text('Quit', font, WHITE, screen, button_11.centerx, button_11.centery)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    fade()
+                    running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if button_8.collidepoint(event.pos):
+                    fade()
+                    button_sound.play()
+                    video_mode(960, 600)
+                    running = False
+                if button_9.collidepoint(event.pos):
+                    fade()
+                    button_sound.play()
+                    video_mode(1280, 800)
+                    running = False
+                if button_10.collidepoint(event.pos):
+                    fade()
+                    button_sound.play()
+                    video_mode(1920, 1080, pygame.FULLSCREEN)
+                    running = False
+                if button_11.collidepoint(event.pos):
+                    fade()
+                    button_sound.play()
+                    running = False
+
+        pygame.display.flip()
+
+# Меню настроек управления
+def control_settings_menu():
+    control_keys = {
+        "Move Left": pygame.K_a,
+        "Move Right": pygame.K_d,
+        "Jump": pygame.K_SPACE,
+        "Crouch": pygame.K_s
+    }
+
+    selected_key = None
+    button_width, button_height = WIDTH // 3, 60
+    button_back = pygame.Rect((WIDTH - button_width) // 2, HEIGHT // 3 + 210, button_width, button_height)
+    running = True
+
+    while running:
+        screen.fill(WHITE)
+        screen.blit(main_background, (0, -1))
+        draw_text('Control Settings', font, BLACK, screen, WIDTH // 2, HEIGHT // 10)
+
+        # Отображение текущих настроек управления
+        for i, (action, key) in enumerate(control_keys.items()):
+            key_name = pygame.key.name(key)  # Получаем название клавиши
+            draw_text(f'{action}: {key_name}', font, BLACK, screen, WIDTH // 2, HEIGHT // 5 + i * 70)
+
+        # Кнопка назад
+        pygame.draw.rect(screen, BLACK, button_back)
+        draw_text('Quit', font, WHITE, screen, button_back.centerx, button_back.centery)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if selected_key:  # Если выбрана клавиша для переназначения
+                    control_keys[selected_key] = event.key  # Обновляем клавишу
+                    selected_key = None
+                elif event.key == pygame.K_ESCAPE:
+                    fade()
+                    running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for i, action in enumerate(control_keys.keys()):
+                    text_rect = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 5 + i * 70 - 30, 200, 60)
+                    if text_rect.collidepoint(event.pos):
+                        selected_key = action  # Выбор действия для переназначения
+                if button_back.collidepoint(event.pos):
+                    fade()
+                    running = False
+
+        pygame.display.flip()
+
+
+# Функция игрового процесса
+def game():
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        screen.fill(BLACK)
+        draw_text('Game is running...', font, WHITE, screen, WIDTH // 2, HEIGHT // 2)
+        pygame.display.update()
+
+# Эффект затемнения
+def fade():
+    running = True
+    fade_alpha = 0
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        fade_surface = pygame.Surface((WIDTH, HEIGHT))
+        fade_surface.fill((0, 0, 0))
+        fade_surface.set_alpha(fade_alpha)
+        screen.blit(fade_surface, (0, 0))
+        fade_alpha += 5
+        if fade_alpha >= 200:
+            fade_alpha = 255
+            running = False
+        pygame.display.flip()
+        clock.tick(MAX_FPS)
+
+# Функция изменения режима видео и загрузки соответствующего фона
+def video_mode(w, h, fullscreen=None):
+    global WIDTH, HEIGHT, screen, main_background
+    WIDTH, HEIGHT = w, h
+    if fullscreen:
+        screen = pygame.display.set_mode((WIDTH, HEIGHT), fullscreen)
+    else:
+        screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+    # Загрузка фонового изображения в зависимости от разрешения
+    if WIDTH == 960 and HEIGHT == 600:
+        main_background = pygame.image.load("images/beckgraund960x600.jpg")
+    elif WIDTH == 1280 and HEIGHT == 800:
+        main_background = pygame.image.load("images/beckgraund1280x800.jpg")
+    elif WIDTH == 1920 and HEIGHT == 1080:
+        main_background = pygame.image.load("images/beckgraund1920x1080.jpg")
+    else:
+        main_background = pygame.image.load("images/beckgraund2.jpg")
+
+# Запуск главного меню
+main_menu()
